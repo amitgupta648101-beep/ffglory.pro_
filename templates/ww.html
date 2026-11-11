@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Glory Engine | Premium Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+:root {
+    --bg-base: #09090b; --bg-surface: #121214; --bg-elevated: #18181b; --bg-hover: #1f1f23;
+    --border-subtle: rgba(255, 255, 255, 0.06); --border-strong: rgba(255, 255, 255, 0.12);
+    --text-main: #ffffff; --text-muted: rgba(255, 255, 255, 0.5); --text-faint: rgba(255, 255, 255, 0.25);
+    --accent-lime: #4ade80; --accent-lime-bg: rgba(74, 222, 128, 0.1); --accent-lime-border: rgba(74, 222, 128, 0.25);
+    --accent-amber: #fbbf24; --accent-amber-bg: rgba(251, 191, 36, 0.1); --accent-amber-border: rgba(251, 191, 36, 0.25);
+    --accent-red: #f87171; --accent-red-bg: rgba(248, 113, 113, 0.1); --accent-red-border: rgba(248, 113, 113, 0.25);
+    --accent-blue: #60a5fa; --accent-blue-bg: rgba(96, 165, 250, 0.1); --accent-blue-border: rgba(96, 165, 250, 0.25);
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-2xl: 32px; --radius-full: 9999px;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3); --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5); --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    --transition-fast: 0.15s ease; --transition-base: 0.25s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { background-color: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif; line-height: 1.5; min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
+a { color: inherit; text-decoration: none; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.flex { display: flex; } .flex-col { flex-direction: column; } .items-center { align-items: center; }
+.justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
+.gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .w-full { width: 100%; }
+.text-center { text-align: center; } .text-right { text-align: right; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-main); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); white-space: nowrap; user-select: none; }
+.btn:hover { background: var(--bg-hover); border-color: rgba(255,255,255,0.2); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary { background: #fff; color: #000; border: 1px solid transparent; }
+.btn-primary:hover { background: #e5e5e5; }
+.btn-danger { background: var(--accent-red-bg); color: var(--accent-red); border-color: var(--accent-red-border); }
+.btn-danger:hover { background: rgba(248, 113, 113, 0.15); }
+.btn-sm { padding: 8px 12px; font-size: 11px; border-radius: var(--radius-sm); }
+.btn-icon { padding: 10px; aspect-ratio: 1; border-radius: var(--radius-md); }
+
+.shell { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); margin-bottom: 24px; box-shadow: var(--shadow-md); }
+.brand { display: flex; align-items: center; gap: 16px; }
+.brand-logo { width: 48px; height: 48px; border-radius: var(--radius-lg); background: #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); }
+.brand-text h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+.brand-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--accent-lime); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse-dot 1.5s ease-in-out infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+.main-grid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+.panel { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-2xl); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
+.panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.01); }
+.panel-title { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 800; }
+.panel-icon { width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--bg-elevated); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-muted); }
+.panel-body { padding: 24px; }
+
+.form-group { margin-bottom: 20px; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-icon { position: absolute; left: 16px; color: var(--text-faint); font-size: 14px; pointer-events: none; transition: color var(--transition-fast); }
+.form-input, .form-select { width: 100%; padding: 14px 16px 14px 44px; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); color: var(--text-main); font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; outline: none; transition: all var(--transition-fast); }
+.form-input:focus, .form-select:focus { border-color: #fff; background: var(--bg-hover); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05); }
+.form-input:focus + .input-icon, .input-wrapper:focus-within .input-icon { color: #fff; }
+.form-input::placeholder { color: var(--text-faint); font-family: 'Inter', sans-serif; font-weight: 400; }
+.form-select { appearance: none; cursor: pointer; font-family: 'Inter', sans-serif; padding-right: 44px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px; }
+.form-select option { background: var(--bg-surface); color: var(--text-main); }
+
+.groups-list { display: flex; flex-direction: column; gap: 16px; }
+.group-card { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 24px; transition: all var(--transition-base); position: relative; overflow: hidden; animation: slide-in 0.4s ease-out; }
+@keyframes slide-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.group-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-lg); }
+.group-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border-strong); transition: background var(--transition-base); }
+.group-card.running::before { background: var(--accent-lime); }
+.group-card.generating::before { background: var(--accent-amber); }
+.group-card.stopped::before { background: var(--accent-red); }
+
+.gc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 16px; }
+.gc-title { font-size: 18px; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+.gc-subtitle { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-weight: 500; }
+.gc-subtitle span { display: flex; align-items: center; gap: 6px; }
+.gc-glory { text-align: right; flex-shrink: 0; }
+.gc-glory-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.gc-glory-value { font-size: 32px; font-weight: 900; color: var(--accent-lime); line-height: 1; letter-spacing: -1px; text-shadow: 0 0 20px rgba(74, 222, 128, 0.2); }
+
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse-dot 1.5s infinite; }
+.badge-running { background: var(--accent-lime-bg); color: var(--accent-lime); border: 1px solid var(--accent-lime-border); }
+.badge-generating { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
+.badge-stopped { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
+
+.gc-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; padding: 16px; background: rgba(0, 0, 0, 0.2); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); }
+.gc-info-item { display: flex; align-items: flex-start; gap: 10px; }
+.gc-info-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; flex-shrink: 0; }
+.gc-info-content { display: flex; flex-direction: column; gap: 2px; }
+.gc-info-label { font-size: 9px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.5px; }
+.gc-info-value { font-size: 13px; font-weight: 700; color: var(--text-main); }
+.gc-info-value.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+.gc-progress { margin-bottom: 24px; }
+.gc-progress-bar { height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 8px; }
+.gc-progress-fill { height: 100%; border-radius: var(--radius-full); transition: width 1s ease-in-out, background 0.3s ease; }
+.running .gc-progress-fill { background: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime); }
+.generating .gc-progress-fill { background: var(--accent-amber); }
+.stopped .gc-progress-fill { background: var(--accent-red); }
+.gc-progress-info { display: flex; justify-content: space-between; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); font-weight: 600; }
+
+.gc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.gc-actions .btn { flex: 1; min-width: 100px; }
+.gc-actions .btn-details { flex: 2; background: #fff; color: #000; border: none; }
+.gc-actions .btn-details:hover { background: #e5e5e5; }
+
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; background: var(--bg-elevated); border: 1px dashed var(--border-strong); border-radius: var(--radius-xl); }
+.empty-state-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--bg-surface); display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--text-faint); margin-bottom: 20px; }
+.empty-state h3 { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+.empty-state p { font-size: 13px; color: var(--text-muted); max-width: 250px; line-height: 1.6; }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all var(--transition-base); }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content { background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-2xl); width: 100%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: var(--shadow-xl); transform: translateY(20px) scale(0.95); transition: all var(--transition-slow); }
+.modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
+.modal-header { padding: 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.modal-header h2 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.modal-close { width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--bg-elevated); border: 1px solid var(--border-strong); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); }
+.modal-close:hover { background: var(--accent-red-bg); color: var(--accent-red); border-color: var(--accent-red-border); }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 20px 24px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; gap: 12px; flex-shrink: 0; background: var(--bg-surface); border-bottom-left-radius: var(--radius-2xl); border-bottom-right-radius: var(--radius-2xl); }
+
+.bot-list { display: flex; flex-direction: column; gap: 12px; }
+.bot-item { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 16px; display: flex; align-items: center; justify-content: space-between; transition: border-color var(--transition-fast); }
+.bot-item:hover { border-color: var(--border-strong); }
+.bot-info { display: flex; align-items: center; gap: 12px; }
+.bot-avatar { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--bg-surface); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+.bot-details h4 { font-size: 14px; font-weight: 700; color: var(--text-main); }
+.bot-details p { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-top: 2px; }
+.bot-stats { text-align: right; }
+.bot-level { font-size: 12px; font-weight: 800; color: #fff; background: var(--bg-surface); padding: 2px 8px; border-radius: var(--radius-sm); display: inline-block; margin-bottom: 4px; }
+.bot-exp { font-size: 11px; font-weight: 700; color: var(--accent-lime); display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 14px 18px; display: flex; align-items: center; gap: 12px; min-width: 280px; max-width: 350px; box-shadow: var(--shadow-xl); pointer-events: auto; animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes toast-in { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+.toast.hiding { animation: toast-out 0.3s ease forwards; }
+@keyframes toast-out { to { opacity: 0; transform: translateX(30px); } }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast-message { font-size: 13px; font-weight: 600; color: var(--text-main); line-height: 1.4; }
+.toast.success { border-color: var(--accent-lime-border); }
+.toast.success .toast-icon { color: var(--accent-lime); }
+.toast.error { border-color: var(--accent-red-border); }
+.toast.error .toast-icon { color: var(--accent-red); }
+.toast.info { border-color: var(--accent-blue-border); }
+.toast.info .toast-icon { color: var(--accent-blue); }
+
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: var(--text-main); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+    .shell { padding: 16px 12px 40px; } .topbar { padding: 16px; } .brand-text h1 { font-size: 18px; }
+    .panel-body { padding: 16px; } .group-card { padding: 20px 16px; } .gc-header { flex-direction: column; }
+    .gc-glory { text-align: left; margin-top: 12px; } .gc-glory-value { font-size: 28px; }
+    .gc-info-grid { grid-template-columns: 1fr; gap: 12px; } .gc-actions { flex-direction: column; }
+    .gc-actions .btn { width: 100%; } .modal-content { max-height: 90vh; }
+    .toast-container { top: 12px; right: 12px; left: 12px; } .toast { min-width: 0; width: 100%; max-width: none; }
+}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+<div class="shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-logo"><i class="fa-solid fa-bolt"></i></div>
+            <div class="brand-text">
+                <h1>Glory Engine</h1>
+                <div class="brand-status"><span class="status-dot"></span><span>Command Center</span></div>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn btn-icon" onclick="fetchGroups(true)" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+    </header>
+
+    <div class="main-grid">
+        <div class="left-panel">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><div class="panel-icon"><i class="fa-solid fa-rocket"></i></div><span>Launch Group</span></div>
+                </div>
+                <div class="panel-body">
+                    <form id="launch-form" onsubmit="handleLaunch(event)">
+                        <div class="form-group">
+                            <label class="form-label">Accounts Region</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-globe input-icon"></i>
+                                <select id="input-region" class="form-select">
+                                    <option value="BD">🇧🇩 Bangladesh (BD)</option>
+                                    <option value="IND" selected>🇮🇳 India (IND)</option>
+                                    <option value="ID">🇮🇩 Indonesia (ID)</option>
+                                    <option value="BR">🇧🇷 Brasil (BR)</option>
+                                    <option value="PK">🇵🇰 Pakistan (PK)</option>
+                                    <option value="ME">🇦🇪 Middle East (ME)</option>
+                                    <option value="RU">🇷🇺 Russia (RU)</option>
+                                    <option value="TH">🇹🇭 Thailand (TH)</option>
+                                    <option value="VN">🇻🇳 Vietnam (VN)</option>
+                                    <option value="US">🇺🇸 United States (US)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Guild ID</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-shield-halved input-icon"></i>
+                                <input id="input-guild-id" class="form-input" type="text" placeholder="e.g. 3055327268" required autocomplete="off">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full" id="btn-launch" style="padding: 16px; margin-top: 8px;">
+                            <i class="fa-solid fa-bolt"></i> Start Glory Pushing
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><div class="panel-icon"><i class="fa-solid fa-layer-group"></i></div><span>My Active Groups</span><span class="badge badge-stopped" id="group-count" style="margin-left: auto;">0</span></div>
+                </div>
+                <div class="panel-body" id="groups-container" style="padding: 16px;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fa-solid fa-ghost"></i></div>
+                        <h3>No Active Groups</h3>
+                        <p>Launch a group using the Guild ID to start pushing glory.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-details" onclick="closeModalIfOutside(event, 'modal-details')">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fa-solid fa-list-ul"></i> Group Details</h2>
+            <button class="modal-close" onclick="closeModal('modal-details')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" id="details-body"></div>
+        <div class="modal-footer"><button class="btn" onclick="closeModal('modal-details')">Close</button></div>
+    </div>
+</div>
+
+<script>
+const API_BASE = "";
+const POLL_INTERVAL = 4000; 
+let currentGroups = [];
+let pollTimer = null;
+
+function escapeHtml(unsafe) { return !unsafe ? "" : String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+function formatDuration(seconds) {
+    seconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    const h = Math.floor(seconds / 3600); const m = Math.floor((seconds % 3600) / 60); const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m`; if (m > 0) return `${m}m ${s}s`; return `${s}s`;
+}
+function formatNumber(num) { return Number(num || 0).toLocaleString(); }
+function formatTime(timestamp) { if (!timestamp) return "N/A"; const d = new Date(timestamp * 1000); return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+
+function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    let icon = "fa-circle-info"; if (type === "success") icon = "fa-circle-check"; if (type === "error") icon = "fa-circle-exclamation";
+    toast.innerHTML = `<i class="fa-solid ${icon} toast-icon"></i><span class="toast-message">${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.add("hiding"); setTimeout(() => toast.remove(), 300); }, 4000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add("active"); document.body.style.overflow = "hidden"; }
+function closeModal(id) { document.getElementById(id).classList.remove("active"); document.body.style.overflow = ""; }
+function closeModalIfOutside(event, id) { if (event.target.id === id) closeModal(id); }
+
+async function handleLaunch(event) {
+    event.preventDefault();
+    const region = document.getElementById("input-region").value;
+    const guildId = document.getElementById("input-guild-id").value.trim();
+    const btn = document.getElementById("btn-launch");
+    
+    if (!guildId || isNaN(guildId)) { showToast("Please enter a valid numeric Guild ID.", "error"); return; }
+    
+    btn.disabled = true; btn.innerHTML = `<div class="spinner"></div> Fetching Guild...`;
+    
+    try {
+        const infoRes = await fetch(`https://star-guild-info.lovable.app/api/public/info?clan_id=${guildId}&region=${region}`);
+        if (!infoRes.ok) throw new Error("Guild not found or API error");
+        const info = await infoRes.json();
+        if (info.status !== "success") throw new Error(info.error_code || "Failed to fetch guild info.");
+        
+        showToast(`Guild found: ${info.clan_name} (Lvl ${info.guild_level})`, "success");
+        btn.innerHTML = `<div class="spinner"></div> Starting Bots...`;
+        
+        const startRes = await fetch(`${API_BASE}/api/create_team`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ region: region, guild_id: guildId, count: 4 })
+        });
+        
+        const startData = await startRes.json();
+        if (!startData.ok) throw new Error(startData.error || "Failed to start group.");
+        
+        showToast("Group launched successfully! Bots are generating...", "success");
+        document.getElementById("input-guild-id").value = "";
+        await fetchGroups(true);
+        
+    } catch (err) { showToast(err.message, "error"); } finally {
+        btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Start Glory Pushing`;
+    }
+}
+
+async function fetchGroups(showToastOnRefresh = false) {
+    try {
+        const res = await fetch(`${API_BASE}/api/groups`);
+        if (!res.ok) throw new Error("Failed to fetch groups.");
+        const data = await res.json();
+        currentGroups = data.groups || [];
+        renderGroups();
+        if (showToastOnRefresh) showToast("Dashboard refreshed.", "info");
+    } catch (err) { console.error(err); }
+}
+
+function renderGroups() {
+    const container = document.getElementById("groups-container");
+    document.getElementById("group-count").innerText = currentGroups.length;
+    
+    if (currentGroups.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><i class="fa-solid fa-ghost"></i></div><h3>No Active Groups</h3><p>Launch a group using the Guild ID to start pushing glory.</p></div>`;
+        return;
+    }
+    
+    let html = `<div class="groups-list">`;
+    currentGroups.forEach(group => {
+        let cardClass = "generating", badgeClass = "badge-generating", statusText = "GENERATING", progressWidth = "30%", progressText = "Initializing bots...";
+        if (group.status === "RUNNING") { cardClass = "running"; badgeClass = "badge-running"; statusText = "RUNNING"; progressWidth = "100%"; progressText = "Pushing Glory..."; }
+        else if (group.status === "STOPPED" || group.status === "FAILED") { cardClass = "stopped"; badgeClass = "badge-stopped"; statusText = group.status; progressWidth = "100%"; progressText = "Completed / Stopped"; }
+        
+        const uptime = Math.max(0, Math.floor((Date.now() / 1000) - group.started_at));
+        
+        html += `
+            <div class="group-card ${cardClass}" id="card-${escapeHtml(group.group_key)}">
+                <div class="gc-header">
+                    <div>
+                        <div class="gc-title"><i class="fa-solid fa-shield-halved" style="color: var(--text-muted);"></i> ${escapeHtml(group.clan_name || "Unknown Guild")}</div>
+                        <div class="gc-subtitle">
+                            <span><i class="fa-solid fa-hashtag"></i> ${escapeHtml(group.guild_id)}</span>
+                            <span><i class="fa-solid fa-star"></i> Lvl ${group.level || 1}</span>
+                            <span><i class="fa-solid fa-crown"></i> ${escapeHtml(group.leader_id || "N/A")}</span>
+                        </div>
+                    </div>
+                    <div class="gc-glory">
+                        <div class="gc-glory-label">Glory Pushed</div>
+                        <div class="gc-glory-value">+${formatNumber(group.glory_pushed || 0)}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;"><span class="badge ${badgeClass}"><span class="dot"></span> ${statusText}</span></div>
+                
+                <div class="gc-info-grid">
+                    <div class="gc-info-item"><div class="gc-info-icon"><i class="fa-solid fa-location-dot"></i></div><div class="gc-info-content"><div class="gc-info-label">Region</div><div class="gc-info-value">${escapeHtml(group.region || "N/A")}</div></div></div>
+                    <div class="gc-info-item"><div class="gc-info-icon"><i class="fa-solid fa-users"></i></div><div class="gc-info-content"><div class="gc-info-label">Members</div><div class="gc-info-value mono">${group.current_members || 0}/${group.max_members || 35}</div></div></div>
+                    <div class="gc-info-item"><div class="gc-info-icon"><i class="fa-solid fa-robot"></i></div><div class="gc-info-content"><div class="gc-info-label">Bots Active</div><div class="gc-info-value mono">${group.accounts.length} / 4</div></div></div>
+                    <div class="gc-info-item"><div class="gc-info-icon"><i class="fa-regular fa-clock"></i></div><div class="gc-info-content"><div class="gc-info-label">Uptime</div><div class="gc-info-value mono">${formatDuration(uptime)}</div></div></div>
+                </div>
+                
+                <div class="gc-progress">
+                    <div class="gc-progress-bar"><div class="gc-progress-fill" style="width: ${progressWidth};"></div></div>
+                    <div class="gc-progress-info"><span>${progressText}</span><span>Started ${formatTime(group.started_at)}</span></div>
+                </div>
+                
+                <div class="gc-actions">
+                    <button class="btn btn-sm" onclick="restartGroup('${escapeHtml(group.group_key)}')"><i class="fa-solid fa-rotate-right"></i> Restart</button>
+                    <button class="btn btn-sm btn-danger" onclick="stopGroup('${escapeHtml(group.group_key)}')"><i class="fa-solid fa-stop"></i> Stop</button>
+                    <button class="btn btn-sm btn-details" onclick="showGroupDetails('${escapeHtml(group.group_key)}')"><i class="fa-solid fa-info-circle"></i> Details</button>
+                </div>
+            </div>
+        `;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+async function stopGroup(groupKey) {
+    if (!confirm("Are you sure you want to stop this group? All active bots will be disconnected.")) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/groups/stop`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ group_key: groupKey }) });
+        const data = await res.json();
+        if (data.ok) { showToast("Group stopped successfully.", "info"); await fetchGroups(); }
+        else throw new Error(data.error || "Failed to stop group.");
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+async function restartGroup(groupKey) {
+    if (!confirm("Restart this group? This will generate 4 new bot accounts.")) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/groups/restart`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ group_key: groupKey }) });
+        const data = await res.json();
+        if (data.ok) { showToast("Group restarting. Generating new bots...", "success"); await fetchGroups(); }
+        else throw new Error(data.error || "Failed to restart group.");
+    } catch (err) { showToast(err.message, "error"); }
+}
+
+function showGroupDetails(groupKey) {
+    const group = currentGroups.find(g => g.group_key === groupKey);
+    if (!group) return;
+    const body = document.getElementById("details-body");
+    
+    if (!group.accounts || group.accounts.length === 0) {
+        body.innerHTML = `<div class="empty-state" style="padding: 30px;"><div class="empty-state-icon"><i class="fa-solid fa-robot"></i></div><h3>No Bots Yet</h3><p>Bots are still generating. Please wait a moment.</p></div>`;
+    } else {
+        let html = `<div class="bot-list">`;
+        group.accounts.forEach(acc => {
+            html += `
+                <div class="bot-item">
+                    <div class="bot-info">
+                        <div class="bot-avatar"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="bot-details"><h4>${escapeHtml(acc.nickname || "Generating...")}</h4><p>UID: ${escapeHtml(acc.uid || "Unknown")}</p></div>
+                    </div>
+                    <div class="bot-stats"><div class="bot-level">Lvl ${acc.level || 1}</div><div class="bot-exp"><i class="fa-solid fa-arrow-trend-up"></i> +${formatNumber(acc.gained_exp || 0)} EXP</div></div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        body.innerHTML = html;
+    }
+    openModal("modal-details");
+}
+
+function startPolling() { if (pollTimer) clearInterval(pollTimer); pollTimer = setInterval(() => fetchGroups(false), POLL_INTERVAL); }
+document.addEventListener("DOMContentLoaded", () => { fetchGroups(); startPolling(); });
+</script>
+</body>
+</html>

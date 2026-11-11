@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RBC Engine | Advanced Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+:root {
+    --bg-base: #030504;
+    --bg-surface: #0a0d0c;
+    --bg-elevated: #121816;
+    --bg-hover: #18201d;
+    
+    --border-subtle: rgba(255, 255, 255, 0.03);
+    --border-strong: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(74, 222, 128, 0.4);
+    
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-faint: #475569;
+    
+    --accent-lime: #4ade80;
+    --accent-lime-bg: rgba(74, 222, 128, 0.1);
+    --accent-lime-glow: rgba(74, 222, 128, 0.5);
+    
+    --accent-amber: #fbbf24;
+    --accent-amber-bg: rgba(251, 191, 36, 0.1);
+    --accent-red: #f87171;
+    --accent-red-bg: rgba(248, 113, 113, 0.1);
+    --accent-blue: #60a5fa;
+    --accent-blue-bg: rgba(96, 165, 250, 0.1);
+    
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 20px; --radius-xl: 28px; --radius-full: 9999px;
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    --shadow-glow: 0 0 40px rgba(74, 222, 128, 0.1);
+    --font-main: 'Outfit', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { 
+    background-color: var(--bg-base); 
+    background-image: 
+        radial-gradient(circle at top right, rgba(74, 222, 128, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at bottom left, rgba(74, 222, 128, 0.03) 0%, transparent 40%),
+        linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+    color: var(--text-main); font-family: var(--font-main); line-height: 1.5; 
+    min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; 
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 700; letter-spacing: -0.02em; }
+.mono { font-family: var(--font-mono); }
+
+/* Layout */
+.app-container { display: flex; min-height: 100vh; }
+.sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border-subtle); padding: 24px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+.main-content { flex: 1; margin-left: 260px; padding: 32px 40px; }
+@media (max-width: 1024px) { 
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 20px; }
+}
+
+/* Sidebar Nav */
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+.brand-logo { width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--accent-lime); color: #000; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 20px var(--accent-lime-glow); }
+.brand-text h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; line-height: 1; }
+.brand-text span { font-size: 10px; color: var(--accent-lime); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+.nav-links { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.nav-item:hover { background: var(--bg-elevated); color: var(--text-main); }
+.nav-item.active { background: var(--accent-lime-bg); color: var(--accent-lime); border-color: var(--border-glow); }
+.nav-item i { width: 20px; text-align: center; font-size: 16px; }
+
+.sys-status { margin-top: auto; padding: 16px; background: var(--bg-elevated); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+.sys-status-header { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+.sys-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime); animation: pulse 2s infinite; }
+.sys-bar { height: 4px; background: var(--border-strong); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.sys-bar-fill { height: 100%; background: var(--accent-lime); width: 45%; border-radius: 2px; }
+.sys-desc { font-size: 10px; color: var(--text-faint); font-family: var(--font-mono); }
+
+/* Topbar */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.page-title { font-size: 28px; font-weight: 800; }
+.page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+.topbar-actions { display: flex; gap: 12px; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-main); font-family: var(--font-main); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn:hover { background: var(--bg-hover); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--accent-lime); color: #000; border: none; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.2); }
+.btn-primary:hover { background: #5ee393; box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4); }
+.btn-danger { background: var(--accent-red-bg); color: var(--accent-red); border-color: var(--accent-red-bg); }
+.btn-outline { background: transparent; border: 1px solid var(--border-strong); }
+.btn-sm { padding: 8px 12px; font-size: 12px; border-radius: var(--radius-sm); }
+
+/* Dashboard Grid */
+.dashboard-grid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 1280px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+/* Global Stats */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; position: relative; overflow: hidden; transition: transform 0.3s; }
+.stat-card:hover { transform: translateY(-4px); border-color: var(--border-strong); }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--accent-lime), transparent); opacity: 0.5; }
+.stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.stat-val { font-size: 32px; font-weight: 900; color: var(--text-main); font-family: var(--font-mono); line-height: 1; letter-spacing: -1px; transition: color 0.3s; }
+.stat-val.lime { color: var(--accent-lime); }
+
+/* Launch Panel */
+.panel { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-card); }
+.panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font-size: 18px; font-weight: 800; }
+.panel-icon { color: var(--accent-lime); font-size: 20px; }
+
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.input-wrapper { position: relative; }
+.input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 14px; transition: color 0.3s; }
+.form-input, .form-select { width: 100%; padding: 16px 16px 16px 46px; background: var(--bg-base); border: 1px solid var(--border-strong); border-radius: var(--radius-md); color: var(--text-main); font-family: var(--font-mono); font-size: 14px; font-weight: 500; outline: none; transition: all 0.3s; }
+.form-input:focus, .form-select:focus { border-color: var(--accent-lime); box-shadow: 0 0 0 3px var(--accent-lime-glow); background: var(--bg-elevated); }
+.form-input:focus + .input-icon { color: var(--accent-lime); }
+.form-select { appearance: none; cursor: pointer; font-family: var(--font-main); }
+
+/* Master Group Card */
+.group-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow-card); position: relative; overflow: hidden; animation: slideIn 0.4s ease-out; }
+.group-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--border-strong); }
+.group-card.running::before { background: var(--accent-lime); box-shadow: 0 0 15px var(--accent-lime); }
+.group-card.generating::before { background: var(--accent-amber); box-shadow: 0 0 15px var(--accent-amber); }
+.group-card.stopped::before { background: var(--accent-red); }
+
+.gc-top { display: flex; gap: 20px; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); }
+.gc-avatar { width: 72px; height: 72px; border-radius: var(--radius-md); background: linear-gradient(135deg, #1f2b24, #0a0d0c); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--accent-lime); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+.gc-info { flex: 1; }
+.gc-name { font-size: 22px; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+.gc-tags { display: flex; gap: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.gc-glory-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 16px; letter-spacing: 0.5px; }
+.gc-glory-val { font-size: 40px; font-weight: 900; color: var(--text-main); line-height: 1; letter-spacing: -1px; }
+
+.gc-sub-stats { display: flex; gap: 32px; margin-bottom: 24px; }
+.gc-stat { display: flex; flex-direction: column; gap: 4px; }
+.gc-stat-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.gc-stat-val { font-size: 16px; font-weight: 700; font-family: var(--font-mono); }
+.gc-stat-val.lime { color: var(--accent-lime); }
+
+/* Weekly Box */
+.gc-weekly-box { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+.gc-weekly-val { font-size: 28px; font-weight: 800; color: var(--accent-lime); font-family: var(--font-mono); line-height: 1.2; }
+.gc-weekly-pill { background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-full); padding: 8px 16px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.gc-weekly-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-lime); box-shadow: 0 0 8px var(--accent-lime); }
+
+/* Controls Card */
+.gc-controls-card { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; }
+.gc-controls-header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+.gc-controls-id { font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 8px; }
+.status-running { background: var(--accent-lime-bg); color: var(--accent-lime); border: 1px solid var(--border-glow); }
+.status-generating { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid rgba(251,191,36,0.3); }
+.status-stopped { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(248,113,113,0.3); }
+
+.gc-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.gc-detail-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.gc-detail-val { font-size: 14px; font-weight: 700; font-family: var(--font-mono); }
+
+.gc-progress-bar { height: 6px; background: var(--border-strong); border-radius: var(--radius-full); overflow: hidden; margin-top: 8px; }
+.gc-progress-fill { height: 100%; border-radius: var(--radius-full); transition: width 1s ease-out; }
+.running .gc-progress-fill { background: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime); }
+.generating .gc-progress-fill { background: var(--accent-amber); }
+
+.gc-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.gc-actions-row { display: flex; gap: 12px; }
+.gc-actions-row .btn { flex: 1; }
+
+/* Skeleton Loader */
+.skeleton { background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+.skeleton-text { height: 20px; margin-bottom: 10px; width: 80%; }
+.skeleton-title { height: 32px; margin-bottom: 16px; width: 60%; }
+
+/* Terminal Panel */
+.terminal-panel { background: #000; border: 1px solid var(--border-strong); border-radius: var(--radius-lg); overflow: hidden; margin-top: 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+.terminal-header { padding: 12px 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+.terminal-title { font-size: 12px; font-family: var(--font-mono); color: var(--text-muted); display: flex; gap: 8px; }
+.terminal-dots { display: flex; gap: 6px; }
+.t-dot { width: 10px; height: 10px; border-radius: 50%; }
+.t-dot.red { background: #ff5f56; } .t-dot.yellow { background: #ffbd2e; } .t-dot.green { background: #27c93f; }
+.terminal-body { padding: 20px; height: 300px; overflow-y: auto; font-family: var(--font-mono); font-size: 12px; line-height: 1.7; }
+.log-line { display: flex; gap: 12px; margin-bottom: 4px; }
+.log-time { color: var(--text-faint); }
+.log-info { color: var(--accent-blue); } .log-success { color: var(--accent-lime); } .log-error { color: var(--accent-red); } .log-warning { color: var(--accent-amber); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; padding: 20px; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content { background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-xl); width: 100%; max-width: 650px; max-height: 85vh; display: flex; flex-direction: column; transform: scale(0.95); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.modal-overlay.active .modal-content { transform: scale(1); }
+.modal-header { padding: 24px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; }
+.modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; transition: color 0.2s; }
+.modal-close:hover { color: var(--accent-red); }
+.modal-body { padding: 24px; overflow-y: auto; }
+
+/* Bot Item */
+.bot-item { background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s; }
+.bot-item:hover { border-color: var(--border-strong); }
+.bot-info { display: flex; gap: 16px; align-items: center; }
+.bot-avatar { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--bg-elevated); display: flex; justify-content: center; align-items: center; font-size: 18px; color: var(--accent-lime); }
+.bot-details h4 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.bot-details p { font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); }
+.bot-actions { display: flex; gap: 8px; }
+
+/* Toasts */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+.toast { background: var(--bg-elevated); border: 1px solid var(--border-strong); border-left: 4px solid var(--accent-lime); border-radius: var(--radius-md); padding: 16px 20px; display: flex; gap: 12px; min-width: 300px; box-shadow: var(--shadow-card); animation: slideIn 0.3s; }
+.toast.error { border-left-color: var(--accent-red); }
+.toast-icon { font-size: 18px; color: var(--accent-lime); }
+.toast.error .toast-icon { color: var(--accent-red); }
+
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.9); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo"><i class="fa-solid fa-bolt"></i></div>
+            <div class="brand-text">
+                <h1>RBC Engine</h1>
+                <span>Command Center</span>
+            </div>
+        </div>
+        
+        <nav class="nav-links">
+            <div class="nav-item active"><i class="fa-solid fa-layer-group"></i> Dashboard</div>
+            <div class="nav-item"><i class="fa-solid fa-terminal"></i> Live Logs</div>
+            <div class="nav-item"><i class="fa-solid fa-chart-line"></i> Analytics</div>
+            <div class="nav-item"><i class="fa-solid fa-gear"></i> Settings</div>
+        </nav>
+        
+        <div class="sys-status">
+            <div class="sys-status-header">
+                <span>System Status</span>
+                <div class="sys-dot"></div>
+            </div>
+            <div class="sys-bar"><div class="sys-bar-fill"></div></div>
+            <div class="sys-desc">Engine Running Perfectly</div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <h1 class="page-title">Dashboard Overview</h1>
+                <p class="page-subtitle">Manage your RBC Bot Groups and monitor live glory.</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-outline" onclick="fetchAll(true)"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-danger" onclick="toggleAllBots()" id="btn-pause-all"><i class="fa-solid fa-pause"></i> Pause All</button>
+            </div>
+        </header>
+
+        <!-- GLOBAL STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-solid fa-robot"></i> Total Bots</div>
+                <div class="stat-val mono" id="stat-bots">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-solid fa-gamepad"></i> Active Matches</div>
+                <div class="stat-val mono lime" id="stat-matches">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-solid fa-arrow-trend-up"></i> Total EXP</div>
+                <div class="stat-val mono" id="stat-exp">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label"><i class="fa-regular fa-clock"></i> Uptime</div>
+                <div class="stat-val mono" id="stat-uptime">0s</div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD GRID -->
+        <div class="dashboard-grid">
+            <!-- LEFT PANEL -->
+            <div class="left-panel">
+                <div class="panel">
+                    <div class="panel-header"><i class="fa-solid fa-rocket panel-icon"></i> Launch New Group</div>
+                    <form id="launch-form" onsubmit="handleLaunch(event)">
+                        <div class="form-group">
+                            <label class="form-label">Region</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-globe input-icon"></i>
+                                <select id="input-region" class="form-select">
+                                    <option value="IND" selected>🇮🇳 India (IND)</option>
+                                    <option value="BD">🇧🇩 Bangladesh (BD)</option>
+                                    <option value="ID">🇮🇩 Indonesia (ID)</option>
+                                    <option value="BR">🇧🇷 Brasil (BR)</option>
+                                    <option value="PK">🇵🇰 Pakistan (PK)</option>
+                                    <option value="ME">🇦🇪 Middle East (ME)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Guild ID</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-shield-halved input-icon"></i>
+                                <input id="input-guild-id" class="form-input" type="text" placeholder="e.g. 3055327268" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full" id="btn-launch" style="padding: 16px;">
+                            <i class="fa-solid fa-bolt"></i> Start Glory Pushing
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+                <div id="groups-container">
+                    <!-- Groups render here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMINAL LOGS -->
+        <div class="terminal-panel">
+            <div class="terminal-header">
+                <div class="terminal-title"><i class="fa-solid fa-terminal"></i> Live Engine Logs</div>
+                <div class="terminal-dots"><div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div></div>
+            </div>
+            <div class="terminal-body" id="terminal-body"></div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-details" onclick="closeModalIfOutside(event, 'modal-details')">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="font-size: 18px; font-weight: 800;"><i class="fa-solid fa-list-ul" style="color:var(--accent-lime);"></i> Bot Control Center</h2>
+            <button class="modal-close" onclick="closeModal('modal-details')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" id="details-body"></div>
+    </div>
+</div>
+
+<script>
+const API_BASE = "";
+const POLL_INTERVAL = 3000; 
+let currentGroups = [];
+let pollTimer = null;
+let lastStats = { bots: 0, matches: 0, exp: 0 };
+let isPausedAll = false;
+
+// Helper Functions
+function escapeHtml(unsafe) { return !unsafe ? "" : String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+function formatDuration(seconds) { seconds = Math.max(0, Math.floor(Number(seconds) || 0)); const h = Math.floor(seconds / 3600); const m = Math.floor((seconds % 3600) / 60); const s = seconds % 60; if (h > 0) return `${h}h ${m}m`; if (m > 0) return `${m}m ${s}s`; return `${s}s`; }
+function formatNumber(num) { return Number(num || 0).toLocaleString(); }
+function formatTime(timestamp) { if (!timestamp) return "N/A"; const d = new Date(timestamp * 1000); return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+
+// Animated Number Counter
+function animateValue(obj, start, end, duration, isFloat = false) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = progress * (end - start) + start;
+        obj.innerText = isFloat ? value.toFixed(1) : formatNumber(Math.floor(value));
+        if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+}
+
+// Toasts
+function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div"); toast.className = `toast ${type}`;
+    let icon = "fa-circle-info"; if (type === "success") icon = "fa-circle-check"; if (type === "error") icon = "fa-circle-exclamation";
+    toast.innerHTML = `<i class="fa-solid ${icon} toast-icon"></i><span style="font-size:13px; font-weight:600;">${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add("active"); document.body.style.overflow = "hidden"; }
+function closeModal(id) { document.getElementById(id).classList.remove("active"); document.body.style.overflow = ""; }
+function closeModalIfOutside(event, id) { if (event.target.id === id) closeModal(id); }
+
+// Fetching Data
+async function fetchAll(showToastOnRefresh = false) {
+    await fetchStats();
+    await fetchGroups();
+    await fetchLogs();
+    if (showToastOnRefresh) showToast("Dashboard refreshed.", "info");
+}
+
+async function fetchStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/stats`); if (!res.ok) return;
+        const data = await res.json();
+        
+        // Animate counters if changed
+        const botsEl = document.getElementById("stat-bots");
+        if (lastStats.bots !== data.total_accounts) animateValue(botsEl, lastStats.bots, data.total_accounts || 0, 800);
+        lastStats.bots = data.total_accounts || 0;
+
+        const matchesEl = document.getElementById("stat-matches");
+        if (lastStats.matches !== data.total_matches_started) animateValue(matchesEl, lastStats.matches, data.total_matches_started || 0, 800);
+        lastStats.matches = data.total_matches_started || 0;
+
+        const expEl = document.getElementById("stat-exp");
+        if (lastStats.exp !== data.total_gained_exp) animateValue(expEl, lastStats.exp, data.total_gained_exp || 0, 800);
+        lastStats.exp = data.total_gained_exp || 0;
+
+        document.getElementById("stat-uptime").innerText = formatDuration(data.uptime || 0);
+    } catch(e) {}
+}
+
+async function fetchLogs() {
+    try {
+        const res = await fetch(`${API_BASE}/api/logs`); if (!res.ok) return;
+        const data = await res.json(); const logs = data.logs || [];
+        if (logs.length === 0) return;
+        const container = document.getElementById("terminal-body"); let html = "";
+        logs.forEach(log => {
+            let lvl = "log-info"; if (log.level === "success") lvl = "log-success"; if (log.level === "error") lvl = "log-error"; if (log.level === "warning") lvl = "log-warning";
+            html += `<div class="log-line"><span class="log-time">[${escapeHtml(log.time)}]</span><span class="${lvl}">${escapeHtml(log.message)}</span></div>`;
+        });
+        const isScrolledToBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 50;
+        container.innerHTML = html;
+        if (isScrolledToBottom) container.scrollTop = container.scrollHeight;
+    } catch(e) {}
+}
+
+async function fetchGroups() {
+    try {
+        const res = await fetch(`${API_BASE}/api/groups`); if (!res.ok) return;
+        const data = await res.json(); currentGroups = data.groups || [];
+        renderGroups();
+    } catch (err) {}
+}
+
+// Render UI
+function renderGroups() {
+    const container = document.getElementById("groups-container");
+    if (currentGroups.length === 0) {
+        container.innerHTML = `<div class="panel" style="text-align:center; padding: 60px 20px;"><i class="fa-solid fa-ghost" style="font-size:48px; color:var(--text-faint); margin-bottom:16px;"></i><h3 style="font-size:20px; margin-bottom:8px;">No Active Groups</h3><p style="color:var(--text-muted);">Launch a group to start pushing glory.</p></div>`;
+        return;
+    }
+    
+    let html = '';
+    currentGroups.forEach(group => {
+        let cardClass = "generating", statusClass = "status-generating", statusText = "GENERATING", progressWidth = "30%";
+        if (group.status === "RUNNING") { cardClass = "running"; statusClass = "status-running"; statusText = "RUNNING"; progressWidth = "100%"; }
+        else if (group.status === "STOPPED" || group.status === "FAILED") { cardClass = "stopped"; statusClass = "status-stopped"; statusText = group.status; progressWidth = "100%"; }
+        
+        const uptime = Math.max(0, Math.floor((Date.now() / 1000) - group.started_at));
+        const totalGlory = group.current_score || 0;
+        const pushedGlory = group.glory_pushed || 0;
+        
+        html += `
+            <div class="group-card ${cardClass}">
+                <div class="gc-top">
+                    <div class="gc-avatar"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="gc-info">
+                        <div class="gc-name">${escapeHtml(group.clan_name || "Unknown")} <i class="fa-solid fa-circle-check" style="color:var(--accent-lime); font-size:14px;"></i></div>
+                        <div class="gc-tags"><span>ID: ${escapeHtml(group.guild_id)}</span><span>|</span><span>${escapeHtml(group.region)}</span></div>
+                        <div class="gc-glory-label">CLAN TOTAL GLORY</div>
+                        <div class="gc-glory-val">${formatNumber(totalGlory)}</div>
+                    </div>
+                </div>
+                
+                <div class="gc-sub-stats">
+                    <div class="gc-stat"><div class="gc-stat-label"><i class="fa-solid fa-users"></i> MEMBERS</div><div class="gc-stat-val">${group.current_members || 0}/${group.max_members || 35}</div></div>
+                    <div class="gc-stat"><div class="gc-stat-label"><i class="fa-solid fa-crown"></i> CAPTAIN</div><div class="gc-stat-val">${escapeHtml(group.leader_id || "Unknown")}</div></div>
+                    <div class="gc-stat" style="margin-left:auto;"><div class="gc-stat-label"><i class="fa-solid fa-crown"></i> GROUP GLORY</div><div class="gc-stat-val lime">${formatNumber(pushedGlory)}</div></div>
+                </div>
+                
+                <div class="gc-weekly-box">
+                    <div>
+                        <div class="gc-stat-label">CLAN</div>
+                        <div style="font-size:14px; font-weight:700; margin-bottom:8px;">${escapeHtml(group.clan_name || "Unknown")}</div>
+                        <div class="gc-stat-label">WEEKLY GLORY</div>
+                        <div class="gc-weekly-val">${formatNumber(totalGlory)}</div>
+                    </div>
+                    <div class="gc-weekly-pill"><div class="dot"></div> 1 GROUP · ${group.status}</div>
+                </div>
+                
+                <div class="panel-header" style="font-size:14px; margin-bottom:16px;">Group details & controls</div>
+                <div class="gc-controls-card">
+                    <div class="gc-controls-header">
+                        <div><div class="gc-controls-id">Group <span style="color:#fff;">${escapeHtml(group.group_key)}</span></div><div class="status-badge ${statusClass}"><div class="dot"></div> ${statusText}</div></div>
+                        <div style="text-align:right;"><div class="gc-stat-label"><i class="fa-regular fa-star"></i> GLORY</div><div class="gc-controls-glory-val" style="font-size:24px; font-weight:900; color:var(--accent-lime);">${formatNumber(pushedGlory)}</div></div>
+                    </div>
+                    <div class="gc-detail-grid">
+                        <div><div class="gc-detail-label"><i class="fa-solid fa-location-dot"></i> Region</div><div class="gc-detail-val">${escapeHtml(group.region)}</div></div>
+                        <div><div class="gc-detail-label"><i class="fa-solid fa-users"></i> Accounts</div><div class="gc-detail-val">${group.accounts.length}</div></div>
+                        <div><div class="gc-detail-label"><i class="fa-regular fa-clock"></i> Uptime</div><div class="gc-detail-val">${formatDuration(uptime)}</div></div>
+                        <div><div class="gc-detail-label"><i class="fa-solid fa-bolt"></i> Started</div><div class="gc-detail-val">${formatTime(group.started_at)}</div></div>
+                    </div>
+                    <div class="gc-progress-header"><span>PROGRESS</span><span>${progressWidth}</span></div>
+                    <div class="gc-progress-bar"><div class="gc-progress-fill" style="width: ${progressWidth};"></div></div>
+                    
+                    <div class="gc-actions">
+                        <div class="gc-actions-row">
+                            <button class="btn btn-outline" onclick="restartGroup('${group.group_key}')"><i class="fa-solid fa-rotate-right"></i> Restart</button>
+                            <button class="btn btn-outline" onclick="stopGroup('${group.group_key}')"><i class="fa-solid fa-circle-stop"></i> Stop</button>
+                        </div>
+                        <button class="btn btn-primary w-full" onclick="showGroupDetails('${group.group_key}')"><i class="fa-solid fa-sliders"></i> Manage Bots</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// Actions
+async function handleLaunch(event) {
+    event.preventDefault(); const region = document.getElementById("input-region").value; const guildId = document.getElementById("input-guild-id").value.trim(); const btn = document.getElementById("btn-launch");
+    if (!guildId || isNaN(guildId)) { showToast("Please enter a valid numeric Guild ID.", "error"); return; }
+    btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Fetching...`;
+    try {
+        const infoRes = await fetch(`https://star-guild-info.lovable.app/api/public/info?clan_id=${guildId}&region=${region}`);
+        if (!infoRes.ok) throw new Error("Guild not found.");
+        const info = await infoRes.json(); if (info.status !== "success") throw new Error("Failed to fetch guild info.");
+        showToast(`Guild found: ${info.clan_name}`, "success"); btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Starting...`;
+        const startRes = await fetch(`${API_BASE}/api/create_team`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ region: region, guild_id: guildId, count: 4 }) });
+        const startData = await startRes.json(); if (!startData.ok) throw new Error(startData.error || "Failed.");
+        showToast("Group launched successfully!", "success"); document.getElementById("input-guild-id").value = ""; await fetchAll();
+    } catch (err) { showToast(err.message, "error"); } finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Start Glory Pushing`; }
+}
+
+async function stopGroup(groupKey) { if (!confirm("Stop this group?")) return; try { const res = await fetch(`${API_BASE}/api/groups/stop`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ group_key: groupKey }) }); const data = await res.json(); if (data.ok) { showToast("Group stopped", "info"); await fetchAll(); } } catch (err) {} }
+async function restartGroup(groupKey) { if (!confirm("Restart this group?")) return; try { const res = await fetch(`${API_BASE}/api/groups/restart`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ group_key: groupKey }) }); const data = await res.json(); if (data.ok) { showToast("Group restarting...", "success"); await fetchAll(); } } catch (err) {} }
+
+async function toggleAllBots() {
+    const btn = document.getElementById("btn-pause-all");
+    isPausedAll = !isPausedAll;
+    btn.innerHTML = isPausedAll ? `<i class="fa-solid fa-play"></i> Resume All` : `<i class="fa-solid fa-pause"></i> Pause All`;
+    showToast(isPausedAll ? "All bots paused" : "All bots resumed", "info");
+    // Add logic to call API /api/account/pause_all
+    try { await fetch(`${API_BASE}/api/account/pause_all`, { method: "POST" }); } catch(e){}
+    await fetchAll();
+}
+
+// Modals & Bot Controls
+let currentActiveGroup = null;
+function showGroupDetails(groupKey) {
+    currentActiveGroup = groupKey; const group = currentGroups.find(g => g.group_key === groupKey); if (!group) return; const body = document.getElementById("details-body");
+    if (!group.accounts || group.accounts.length === 0) {
+        body.innerHTML = `<div style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:32px; color:var(--accent-lime);"></i><p style="margin-top:16px; color:var(--text-muted);">Bots are generating. Please wait...</p></div>`;
+    } else {
+        let html = ``;
+        group.accounts.forEach(acc => {
+            const isPaused = acc.status === "PAUSED";
+            const inMatch = acc.status === "IN_MATCH";
+            const statusColor = isPaused ? "var(--accent-red)" : (inMatch ? "var(--accent-amber)" : "var(--accent-lime)");
+            const pauseIcon = isPaused ? "fa-play" : "fa-pause";
+            
+            html += `
+                <div class="bot-item">
+                    <div class="bot-info">
+                        <div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <div class="bot-details">
+                            <h4>${escapeHtml(acc.nickname || "Bot")} <span style="font-size:10px; padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.05); color:${statusColor};">${acc.status || 'ONLINE'}</span></h4>
+                            <p>UID: ${escapeHtml(acc.uid || "Unknown")}</p>
+                        </div>
+                    </div>
+                    <div class="bot-actions">
+                        <div style="text-align:right; margin-right:12px;">
+                            <div style="font-size:12px; font-weight:700;">Lvl ${acc.level || 1}</div>
+                            <div style="font-size:11px; font-weight:700; color:var(--accent-lime);">+${formatNumber(acc.gained_exp || 0)} EXP</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline" onclick="refreshBot('${acc.uid}')"><i class="fa-solid fa-rotate"></i></button>
+                        <button class="btn btn-sm btn-outline" style="color:${isPaused ? 'var(--accent-lime)' : ''}" onclick="toggleBotPause('${acc.uid}')"><i class="fa-solid ${pauseIcon}"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+        body.innerHTML = html;
+    }
+    openModal("modal-details");
+}
+
+async function toggleBotPause(uid) { try { const res = await fetch(`${API_BASE}/api/account/pause`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: uid }) }); const data = await res.json(); if (data.status === "ok") { showToast(`Bot ${data.is_paused ? 'Paused' : 'Resumed'}`, "info"); await fetchGroups(); showGroupDetails(currentActiveGroup); } } catch(err) {} }
+async function refreshBot(uid) { try { await fetch(`${API_BASE}/api/account/refresh`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: uid }) }); showToast("Bot refresh requested", "success"); } catch(err) {} }
+
+// Init
+function startPolling() { if (pollTimer) clearInterval(pollTimer); pollTimer = setInterval(() => { fetchStats(); fetchGroups(); fetchLogs(); }, POLL_INTERVAL); }
+document.addEventListener("DOMContentLoaded", () => { fetchAll(); startPolling(); });
+</script>
+</body>
+</html>
